@@ -1,3 +1,10 @@
+/easy-common/easy-common.iml
+.idea/
+
+/*/target/
+*.iml
+/*/*.iml
+/logs/
 # Compiled class file
 *.class
 
