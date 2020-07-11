@@ -51,9 +51,33 @@ public @interface AppStarting {
 
     Class[] packages() default {};
 }
-
-
 ```
 
+##### Controller
+默认依照方法的属性，最多注入 
 
+- ***reactor.netty.http.server.HttpServerRequest***
+- ***reactor.netty.http.server.HttpServerResponse***
 
+返回值自动转换为Json
+- 字符串   -> 字符串
+- 包装类型 ->Json 字符串
+
+```java
+/**
+ * @author liaojinlong
+ * @since 2020/7/10 16:18
+ */
+@Component
+@RequestMapping
+public class AppComponent {
+    @GetMapping("/test2")
+    public Map<String, Object> test1(HttpServerRequest httpServerRequest) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("result", 200);
+        result.put("desc", 88888);
+        return result;
+    }
+}
+
+```
