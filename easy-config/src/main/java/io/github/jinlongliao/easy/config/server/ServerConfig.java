@@ -21,7 +21,7 @@ package io.github.jinlongliao.easy.config.server;
  * @since 2020/7/10 10:06
  */
 public class ServerConfig {
-    private int port = 8806;
+    private int port = 5921;
     private String host = "0.0.0.0";
     private boolean enableSsl = false;
 

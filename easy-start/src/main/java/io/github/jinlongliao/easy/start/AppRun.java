@@ -10,10 +10,8 @@ import io.github.jinlongliao.easy.start.context.AppContext;
 import io.github.jinlongliao.easy.start.context.DefaultAppServerContext;
 import io.github.jinlongliao.easy.reflection.util.LogUtil;
 import org.slf4j.Logger;
-import reactor.netty.DisposableServer;
 import reactor.netty.http.server.HttpServer;
 
-import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
@@ -67,7 +65,7 @@ public class AppRun {
                 try {
                     ((AppContextAware) aClass.newInstance()).setResource(appContext);
                 } catch (ReflectiveOperationException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         }
