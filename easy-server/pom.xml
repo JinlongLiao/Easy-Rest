@@ -5,7 +5,7 @@
     <parent>
         <artifactId>easy-rest</artifactId>
         <groupId>io.github.jinlongliao</groupId>
-        <version>0.1.0.0-SNAPSHOP</version>
+        <version>0.1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

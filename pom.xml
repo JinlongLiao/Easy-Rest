@@ -9,7 +9,7 @@
     <groupId>io.github.jinlongliao</groupId>
     <artifactId>easy-rest</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.0.0-SNAPSHOP</version>
+    <version>0.1.0.0</version>
     <modules>
         <module>easy-common</module>
         <module>easy-config</module>
