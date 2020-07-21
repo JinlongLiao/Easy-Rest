@@ -1,9 +1,9 @@
 package io.github.jinlongliao.easy.start.context;
 
-import io.github.jinlongliao.easy.start.context.build.IContainer;
+import io.github.jinlongliao.easy.server.IServer;
+import io.github.jinlongliao.easy.start.context.container.IContainer;
 import io.github.jinlongliao.easy.start.reflection.Reflection;
 import io.github.jinlongliao.easy.config.server.ServerConfig;
-import reactor.netty.http.server.HttpServer;
 
 /**
  * @author liaojinlong
@@ -25,14 +25,14 @@ public interface AppContext {
     /**
      * @param httpServer
      */
-    void setHttpServer(HttpServer httpServer);
+    void setHttpServer(IServer httpServer);
 
     /**
      * @return
      */
-    HttpServer getHttpServer();
+    IServer getHttpServer();
 
     IContainer getIContainer();
 
-    void start();
+    void start() throws Exception;
 }

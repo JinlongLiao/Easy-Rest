@@ -48,11 +48,6 @@ public class AppRun {
     }
 
     private static void startApp(ServerConfig serverConfig) {
-        HttpServer server =
-                HttpServer.create()
-                        .host(serverConfig.getHost())
-                        .port(serverConfig.getPort());
-        appContext.setHttpServer(server);
         final Set<Class<? extends AppContextAware>> classes = appContext
                 .getReflection()
                 .reflectionClass(AppContextAware.class);
@@ -69,7 +64,12 @@ public class AppRun {
                 }
             }
         }
-        appContext.start();
+        try {
+            appContext.start();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            System.exit(-1);
+        }
     }
 
     private static void initContext(Class clazz, String[] args) throws IllegalAccessException, InstantiationException {

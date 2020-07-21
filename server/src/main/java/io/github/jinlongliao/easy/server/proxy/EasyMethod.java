@@ -1,4 +1,4 @@
-package io.github.jinlongliao.easy.start.context.build.action;
+package io.github.jinlongliao.easy.server.proxy;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
 

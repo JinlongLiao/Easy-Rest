@@ -1,32 +1,33 @@
-package io.github.jinlongliao.easy.start.proxy;
+package io.github.jinlongliao.easy.server.proxy;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
 import io.github.jinlongliao.easy.common.serialization.Decode;
 import io.github.jinlongliao.easy.common.serialization.Encode;
-import io.github.jinlongliao.easy.start.filter.IFilter;
-import reactor.core.publisher.Mono;
+import io.github.jinlongliao.easy.common.filter.IFilter;
 import reactor.netty.http.server.HttpServerRequest;
 import reactor.netty.http.server.HttpServerResponse;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
  * @author liaojinlong
  * @since 2020/7/10 18:43
  */
-public abstract class AbstractEasyInvocationHandler implements InvocationHandler {
-    abstract Object[] getArgs(Object[] args);
+public abstract class AbstractEasyInvocationHandler<T, K> implements InvocationHandler {
+    public abstract Object[] getArgs(Object[] args);
 
-    abstract IFilter[] getFilter();
+    public abstract IFilter[] getFilter();
 
-    abstract Object getTarget();
+    public abstract Object getTarget();
 
-    abstract Method getMethod();
+    public abstract Method getMethod();
 
-    abstract Encode getEncode();
+    public abstract Encode getEncode();
 
-    abstract Decode getDecode();
+    public abstract Decode getDecode();
 
     /**
      * Processes a method invocation on a proxy instance and returns
@@ -81,22 +82,22 @@ public abstract class AbstractEasyInvocationHandler implements InvocationHandler
                 iFilter.before(getHttpMethod(args), getHttpServerRequest(args), getHttpServerResponse(args));
             }
         }
-        Object invoke = getMethod().invoke(getTarget(), getArgs(args));
 
-        if (filter != null) {
-            for (IFilter iFilter : filter) {
-                invoke = iFilter.after(getHttpMethod(args), getHttpServerRequest(args), getHttpServerResponse(args), invoke);
-            }
-        }
-        HttpServerResponse response = (HttpServerResponse) args[2];
-        HttpServerRequest request = (HttpServerRequest) args[1];
-        Mono mono = invoke == null ?
-                Mono.empty() :
-                Mono.from(response.sendString(Mono.just(
-                        (invoke instanceof String ? invoke : getEncode().encode(invoke)).toString()
-                )));
-        return mono;
+        K response = (K) args[2];
+        T request = (T) args[1];
+
+        return invoke(request, response, args);
     }
+
+    /**
+     * @param request
+     * @param response
+     * @param args
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    protected abstract Object invoke(T request, K response, Object[] args) throws InvocationTargetException, IllegalAccessException, IOException;
 
     protected HttpServerRequest getHttpServerRequest(Object[] args) {
         return (HttpServerRequest) args[1];

@@ -1,4 +1,4 @@
-package io.github.jinlongliao.easy.start.context.build;
+package io.github.jinlongliao.easy.start.context.container;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -6,19 +6,13 @@ import cn.hutool.core.util.StrUtil;
 import io.github.jinlongliao.easy.common.annotation.Component;
 import io.github.jinlongliao.easy.common.annotation.RequestMapping;
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
-import io.github.jinlongliao.easy.common.exception.top.EasyRestRuntimeException;
 import io.github.jinlongliao.easy.common.util.ClassUtils;
-import io.github.jinlongliao.easy.start.action.IRouter;
+import io.github.jinlongliao.easy.server.ServerFactory;
+import io.github.jinlongliao.easy.server.action.IRouter;
 import io.github.jinlongliao.easy.start.context.AppContext;
-import io.github.jinlongliao.easy.start.context.build.action.EasyMethod;
-import io.github.jinlongliao.easy.start.proxy.CommonInvocationHandler;
-import io.github.jinlongliao.easy.start.proxy.ComputerArgs;
-import reactor.netty.http.server.HttpServerRequest;
-import reactor.netty.http.server.HttpServerResponse;
+import io.github.jinlongliao.easy.server.proxy.EasyMethod;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,58 +65,10 @@ public class Container implements IContainer {
     }
 
     private void buildAction() throws IllegalAccessException, InstantiationException {
-        for (String key : methodCache.keySet()) {
-            final List<EasyMethod> easyMethods = methodCache.get(key);
-            for (EasyMethod easyMethod : easyMethods) {
-                final Class aClass = easyMethod.getaClass();
-                final Method method = easyMethod.getMethod();
-                final List<String> urlPath = easyMethod.getUrlPath();
-                List<HttpMethod> methods = easyMethod.getMethods();
-                methods = CollectionUtil.isEmpty(methods) ? Arrays.asList(HttpMethod.values()) : methods;
-                for (HttpMethod httpMethod : methods) {
-                    IRouter router = null;
-                    if (methodIRouterMap.containsKey(method)) {
-                        router = methodIRouterMap.get(method);
-                    } else {
-                        ComputerArgs computerArgs = getArgs(method);
-
-                        final InvocationHandler invocationHandler = new CommonInvocationHandler(aClass.newInstance(),
-                                method,
-                                null,
-                                computerArgs);
-
-                        router = (IRouter) Proxy.newProxyInstance(IRouter.class.getClassLoader(),
-                                new Class[]{IRouter.class},
-                                invocationHandler);
-                        methodIRouterMap.put(method, router);
-
-                    }
-                    for (String url : urlPath) {
-                        routers.get(httpMethod).put(url, router);
-                    }
-                }
-            }
-        }
+        ServerFactory.getInstance().getServer().buildRouter(routers,methodCache,methodIRouterMap);
     }
 
 
-    private ComputerArgs getArgs(Method method) {
-        final Class<?>[] parameterTypes = method.getParameterTypes();
-        int compute = 0;
-        if (parameterTypes == null || parameterTypes.length < 1) {
-        } else {
-            for (Class<?> aClass : parameterTypes) {
-                if (aClass.equals(HttpServerResponse.class)) {
-                    compute += 2;
-                } else if (aClass.equals(HttpServerRequest.class)) {
-                    compute += 1;
-                } else {
-                    throw new EasyRestRuntimeException("参数配置 仅支持HttpServerRequest，HttpServerResponse ,不支持：" + aClass.getName());
-                }
-            }
-        }
-        return new ComputerArgs.Default(compute);
-    }
 
     /**
      * 构建Controller

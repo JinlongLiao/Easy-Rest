@@ -1,4 +1,4 @@
-package junit4;
+package io.github.jinlongliao.easy.sample;
 
 import cn.hutool.core.lang.Assert;
 import io.github.jinlongliao.easy.common.annotation.AppStarting;
