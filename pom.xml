@@ -14,8 +14,8 @@
         <module>easy-common</module>
         <module>easy-config</module>
         <module>easy-start</module>
+        <module>easy-server</module>
         <module>sample</module>
-        <module>server</module>
     </modules>
     <dependencies>
         <dependency>
