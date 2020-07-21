@@ -5,10 +5,11 @@
 
 #### 软件架构
 - easy-rest 
--- easy-common
--- easy-config
--- easy-start
--- sample
+    - easy-common 公共
+    - easy-config 配置
+    - easy-server 服务器（netty/servlet）
+    - easy-start 启动
+    - sample 案例
 
 
 #### 注解

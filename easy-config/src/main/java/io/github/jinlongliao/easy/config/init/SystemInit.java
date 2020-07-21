@@ -8,6 +8,8 @@ import org.apache.commons.cli.Options;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Properties;
 
@@ -21,6 +23,13 @@ public class SystemInit {
         final Options options = CliUtil.getDefaultOption();
         final CommandLine commandLine = CliUtil.parseCli(options, args);
         final Properties properties = new Properties();
+        final URL resource = this.getClass().getResource("/app.properties");
+        if (resource != null) {
+            try (InputStream inStream = resource.openStream()) {
+                properties.load(inStream);
+            } catch (IOException e) {
+            }
+        }
         if (commandLine.hasOption(CliUtil.P)) {
             final String configPath = commandLine.getOptionValue(CliUtil.P);
             try {

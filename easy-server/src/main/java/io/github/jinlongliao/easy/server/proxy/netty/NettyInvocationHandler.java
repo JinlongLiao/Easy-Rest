@@ -33,32 +33,32 @@ public class NettyInvocationHandler extends AbstractEasyInvocationHandler<HttpSe
     }
 
     @Override
-    public  Object[] getArgs(Object[] args) {
+    public Object[] getArgs(Object[] args) {
         return computerArgs.computer(args);
     }
 
     @Override
-    public  IFilter[] getFilter() {
+    public IFilter[] getFilter() {
         return iFilters;
     }
 
     @Override
-    public  Object getTarget() {
+    public Object getTarget() {
         return target;
     }
 
     @Override
-    public  Method getMethod() {
+    public Method getMethod() {
         return method;
     }
 
     @Override
-    public   Encode getEncode() {
+    public Encode getEncode() {
         return encode;
     }
 
     @Override
-    public  Decode getDecode() {
+    public Decode getDecode() {
         return decode;
     }
 
@@ -71,11 +71,12 @@ public class NettyInvocationHandler extends AbstractEasyInvocationHandler<HttpSe
                 invoke = iFilter.after(getHttpMethod(args), getHttpServerRequest(args), getHttpServerResponse(args), invoke);
             }
         }
-        Mono mono = invoke == null ?
-                Mono.empty() :
-                Mono.from(response.sendString(Mono.just(
-                        (invoke instanceof String ? invoke : getEncode().encode(invoke)).toString()
-                )));
+        if (invoke == null) {
+            invoke = "{\"message\":\"NOT FOUND " + args[0] + ":" + request.path() + "\"}";
+        }
+        Mono mono = Mono.from(response.sendString(Mono.just(
+                (invoke instanceof String ? invoke : getEncode().encode(invoke)).toString()
+        )));
         return mono;
     }
 

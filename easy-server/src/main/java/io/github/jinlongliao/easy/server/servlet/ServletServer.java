@@ -5,10 +5,11 @@ import io.github.jinlongliao.easy.common.constant.HttpMethod;
 import io.github.jinlongliao.easy.common.exception.top.EasyRestRuntimeException;
 import io.github.jinlongliao.easy.config.server.ServerConfig;
 import io.github.jinlongliao.easy.server.IServer;
+import io.github.jinlongliao.easy.server.ServerFactory;
 import io.github.jinlongliao.easy.server.action.IRouter;
 import io.github.jinlongliao.easy.server.proxy.ComputerArgs;
 import io.github.jinlongliao.easy.server.proxy.EasyMethod;
-import io.github.jinlongliao.easy.server.proxy.netty.NettyInvocationHandler;
+import io.github.jinlongliao.easy.server.proxy.servlet.ServletInvocationHandler;
 import io.github.jinlongliao.easy.server.servlet.router.ServletRouter;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -45,10 +46,10 @@ public class ServletServer implements IServer {
         DeploymentInfo servletBuilder = Servlets.deployment()
                 .setClassLoader(ServletServer.class.getClassLoader())
                 .setContextPath("/")
-//                .setDeploymentName("test.war")
+                .setDeploymentName(serverConfig.getServerName())
                 .addServlets(
                         Servlets.servlet("GeneralServlet", GeneralServlet.class)
-                                .addMapping("/**"));
+                                .addMapping("/*"));
 
         DeploymentManager manager = Servlets.defaultContainer().addDeployment(servletBuilder);
         manager.deploy();
@@ -89,7 +90,7 @@ public class ServletServer implements IServer {
                     } else {
                         ComputerArgs computerArgs = getArgs(method);
 
-                        final InvocationHandler invocationHandler = new NettyInvocationHandler(aClass.newInstance(),
+                        final InvocationHandler invocationHandler = new ServletInvocationHandler(aClass.newInstance(),
                                 method,
                                 null,
                                 computerArgs);
@@ -135,5 +136,10 @@ public class ServletServer implements IServer {
     @Override
     public void addRouter(Map<HttpMethod, Map<String, IRouter>> router) {
         GeneralServlet.setRouter(router);
+    }
+
+    @Override
+    public String getName() {
+        return ServerFactory.DEFAULT;
     }
 }

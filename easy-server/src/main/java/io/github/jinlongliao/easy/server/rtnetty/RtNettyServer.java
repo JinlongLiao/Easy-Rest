@@ -165,4 +165,9 @@ public class RtNettyServer implements IServer {
                 .block();
     }
 
+    @Override
+    public String getName() {
+        return "RT_NETTY";
+    }
+
 }

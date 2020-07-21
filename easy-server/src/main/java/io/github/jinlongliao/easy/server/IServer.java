@@ -1,7 +1,7 @@
 package io.github.jinlongliao.easy.server;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
-  import io.github.jinlongliao.easy.server.proxy.EasyMethod;
+import io.github.jinlongliao.easy.server.proxy.EasyMethod;
 import io.github.jinlongliao.easy.config.server.ServerConfig;
 import io.github.jinlongliao.easy.server.action.IRouter;
 
@@ -40,4 +40,8 @@ public interface IServer {
      */
     void addRouter(Map<HttpMethod, Map<String, IRouter>> router);
 
+    /**
+     * @return 唯一名称
+     */
+    String getName();
 }

@@ -65,9 +65,8 @@ public class Container implements IContainer {
     }
 
     private void buildAction() throws IllegalAccessException, InstantiationException {
-        ServerFactory.getInstance().getServer().buildRouter(routers,methodCache,methodIRouterMap);
+        ServerFactory.getInstance().getServer(appContext.getServerConfig()).buildRouter(routers, methodCache, methodIRouterMap);
     }
-
 
 
     /**

@@ -83,10 +83,10 @@ public abstract class AbstractEasyInvocationHandler<T, K> implements InvocationH
             }
         }
 
-        K response = (K) args[2];
-        T request = (T) args[1];
-
-        return invoke(request, response, args);
+        T request = (T) ((Object[]) args[1])[0];
+        K response = (K) ((Object[]) args[1])[1];
+        final Object[] objects = {args[0], request, request};
+        return invoke(request, response, objects);
     }
 
     /**

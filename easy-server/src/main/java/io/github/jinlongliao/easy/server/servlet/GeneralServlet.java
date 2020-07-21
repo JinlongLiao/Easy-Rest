@@ -1,5 +1,6 @@
 package io.github.jinlongliao.easy.server.servlet;
 
+import cn.hutool.core.collection.CollectionUtil;
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
 import io.github.jinlongliao.easy.server.action.IRouter;
 
@@ -19,29 +20,40 @@ public class GeneralServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final String pathInfo = req.getPathInfo();
-        final Map<String, IRouter> routerMap = router.get(HttpMethod.GET);
-        final IRouter iRouter = routerMap.get(pathInfo);
-        iRouter.router(HttpMethod.GET, req, resp);
+        this.router(HttpMethod.GET, req, resp);
     }
 
     @Override
     protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doHead(req, resp);
+        this.router(HttpMethod.GET, req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        this.router(HttpMethod.POST, req, resp);
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);
+        this.router(HttpMethod.PUT, req, resp);
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doDelete(req, resp);
+        this.router(HttpMethod.DEL, req, resp);
+    }
+
+    protected void router(HttpMethod httpMethod, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        final String pathInfo = req.getPathInfo();
+        final Map<String, IRouter> routerMap = router.get(httpMethod);
+        if (CollectionUtil.isNotEmpty(routerMap)) {
+            final IRouter iRouter = routerMap.get(pathInfo);
+            if (iRouter != null) {
+                iRouter.router(httpMethod, req, resp);
+                return;
+            }
+        }
+        resp.setStatus(404);
+        resp.getWriter().write("{\"message\":\"NOT FOUND " + httpMethod.name() + ":" + pathInfo + "\"}");
     }
 }

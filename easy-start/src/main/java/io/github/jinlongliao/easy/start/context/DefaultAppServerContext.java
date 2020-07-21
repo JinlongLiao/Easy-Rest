@@ -2,6 +2,7 @@ package io.github.jinlongliao.easy.start.context;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
 import io.github.jinlongliao.easy.server.IServer;
+import io.github.jinlongliao.easy.server.ServerFactory;
 import io.github.jinlongliao.easy.server.action.IRouter;
 import io.github.jinlongliao.easy.start.context.container.Container;
 import io.github.jinlongliao.easy.start.context.container.IContainer;
@@ -24,6 +25,7 @@ public class DefaultAppServerContext implements AppContext {
         this.serverConfig = serverConfig;
         this.reflection = reflection;
         container = new Container(this);
+        httpServer = ServerFactory.getInstance().getServer(serverConfig);
     }
 
     @Override

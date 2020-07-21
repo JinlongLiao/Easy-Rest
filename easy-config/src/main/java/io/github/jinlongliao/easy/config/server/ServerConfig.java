@@ -23,6 +23,8 @@ package io.github.jinlongliao.easy.config.server;
 public class ServerConfig {
     private int port = 5921;
     private String host = "0.0.0.0";
+    private String serverType = "DEFAULT";
+    private String serverName = "EASY_REST";
     private boolean enableSsl = false;
 
     public int getPort() {
@@ -47,5 +49,21 @@ public class ServerConfig {
 
     public void setEnableSsl(boolean enableSsl) {
         this.enableSsl = enableSsl;
+    }
+
+    public String getServerType() {
+        return serverType;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setServerType(String serverType) {
+        this.serverType = serverType;
     }
 }

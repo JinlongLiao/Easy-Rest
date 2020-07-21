@@ -15,7 +15,6 @@
         <module>easy-config</module>
         <module>easy-start</module>
         <module>sample</module>
-        <module>test</module>
         <module>server</module>
     </modules>
     <dependencies>
