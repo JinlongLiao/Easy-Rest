@@ -1,6 +1,7 @@
 package io.github.jinlongliao.easy.server.proxy;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
+import io.github.jinlongliao.easy.common.filter.FilterChain;
 import io.github.jinlongliao.easy.common.serialization.Decode;
 import io.github.jinlongliao.easy.common.serialization.Encode;
 import io.github.jinlongliao.easy.common.filter.IFilter;
@@ -19,7 +20,7 @@ import java.lang.reflect.Method;
 public abstract class AbstractEasyInvocationHandler<T, K> implements InvocationHandler {
     public abstract Object[] getArgs(Object[] args);
 
-    public abstract IFilter[] getFilter();
+    public abstract FilterChain getFilter();
 
     public abstract Object getTarget();
 
@@ -76,13 +77,8 @@ public abstract class AbstractEasyInvocationHandler<T, K> implements InvocationH
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        final IFilter[] filter = getFilter();
-        if (filter != null) {
-            for (IFilter iFilter : filter) {
-                iFilter.before(getHttpMethod(args), getHttpServerRequest(args), getHttpServerResponse(args));
-            }
-        }
-
+        final  FilterChain filterChain = getFilter();
+        filterChain.doBeforeFilter( getHttpMethod(args),args);
         T request = (T) ((Object[]) args[1])[0];
         K response = (K) ((Object[]) args[1])[1];
         final Object[] objects = {args[0], request, request};

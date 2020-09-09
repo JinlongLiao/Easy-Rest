@@ -1,9 +1,9 @@
 package io.github.jinlongliao.easy.server.proxy.netty;
 
 
+import io.github.jinlongliao.easy.common.filter.FilterChain;
 import io.github.jinlongliao.easy.common.serialization.Decode;
 import io.github.jinlongliao.easy.common.serialization.Encode;
-import io.github.jinlongliao.easy.common.filter.IFilter;
 import io.github.jinlongliao.easy.server.proxy.AbstractEasyInvocationHandler;
 import io.github.jinlongliao.easy.server.proxy.ComputerArgs;
 import reactor.core.publisher.Mono;
@@ -18,17 +18,17 @@ import java.lang.reflect.Method;
  * @since 2020/7/10 18:44
  */
 public class NettyInvocationHandler extends AbstractEasyInvocationHandler<HttpServerRequest, HttpServerResponse> {
+    private final FilterChain filterChain;
     private Object target;
     private Method method;
-    private IFilter[] iFilters;
     private ComputerArgs computerArgs;
     private Decode decode = new Decode.DefaultDecode();
     private Encode encode = new Encode.DefaultEncode();
 
-    public NettyInvocationHandler(Object target, Method method, IFilter[] iFilters, ComputerArgs computerArgs) {
+    public NettyInvocationHandler(Object target, Method method, FilterChain filterChain, ComputerArgs computerArgs) {
         this.target = target;
         this.method = method;
-        this.iFilters = iFilters;
+        this.filterChain = filterChain;
         this.computerArgs = computerArgs;
     }
 
@@ -38,9 +38,10 @@ public class NettyInvocationHandler extends AbstractEasyInvocationHandler<HttpSe
     }
 
     @Override
-    public IFilter[] getFilter() {
-        return iFilters;
+    public FilterChain getFilter() {
+        return filterChain;
     }
+
 
     @Override
     public Object getTarget() {
@@ -66,11 +67,8 @@ public class NettyInvocationHandler extends AbstractEasyInvocationHandler<HttpSe
     protected Object invoke(HttpServerRequest request, HttpServerResponse response, Object[] args) throws InvocationTargetException, IllegalAccessException {
         Object invoke = getMethod().invoke(getTarget(), getArgs(args));
 
-        if (getFilter() != null) {
-            for (IFilter iFilter : getFilter()) {
-                invoke = iFilter.after(getHttpMethod(args), getHttpServerRequest(args), getHttpServerResponse(args), invoke);
-            }
-        }
+        invoke = getFilter().doAfterFilter(getHttpMethod(args), invoke, args);
+
         if (invoke == null) {
             invoke = "{\"message\":\"NOT FOUND " + args[0] + ":" + request.path() + "\"}";
         }

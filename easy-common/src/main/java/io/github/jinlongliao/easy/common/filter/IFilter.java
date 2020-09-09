@@ -11,8 +11,8 @@ public interface IFilter {
      * @param method
      * @return /
      */
-    default boolean before(HttpMethod method, Object... objects) {
-        return true;
+    default void before(FilterChain filterChain, HttpMethod method, Object... objects) {
+        filterChain.doAfterFilter(method, objects);
     }
 
 
@@ -21,8 +21,8 @@ public interface IFilter {
      * @param result
      * @return /
      */
-    default Object after(HttpMethod method, Object result, Object... objects) {
-        return result;
+    default Object after(FilterChain filterChain, HttpMethod method, Object result, Object... objects) {
+        return filterChain.doAfterFilter(method, objects);
     }
 
 }

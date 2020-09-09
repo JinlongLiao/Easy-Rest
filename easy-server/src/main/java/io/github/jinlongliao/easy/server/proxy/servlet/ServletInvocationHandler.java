@@ -1,6 +1,6 @@
 package io.github.jinlongliao.easy.server.proxy.servlet;
 
-import io.github.jinlongliao.easy.common.filter.IFilter;
+import io.github.jinlongliao.easy.common.filter.FilterChain;
 import io.github.jinlongliao.easy.common.serialization.Decode;
 import io.github.jinlongliao.easy.common.serialization.Encode;
 import io.github.jinlongliao.easy.server.proxy.AbstractEasyInvocationHandler;
@@ -20,15 +20,15 @@ import java.util.Objects;
 public class ServletInvocationHandler extends AbstractEasyInvocationHandler<HttpServletRequest, HttpServletResponse> {
     private Object target;
     private Method method;
-    private IFilter[] iFilters;
+    private FilterChain filterChain;
     private ComputerArgs computerArgs;
     private Decode decode = new Decode.DefaultDecode();
     private Encode encode = new Encode.DefaultEncode();
 
-    public ServletInvocationHandler(Object target, Method method, IFilter[] iFilters, ComputerArgs computerArgs) {
+    public ServletInvocationHandler(Object target, Method method, FilterChain filterChain, ComputerArgs computerArgs) {
         this.target = target;
         this.method = method;
-        this.iFilters = iFilters;
+        this.filterChain = filterChain;
         this.computerArgs = computerArgs;
     }
 
@@ -38,8 +38,8 @@ public class ServletInvocationHandler extends AbstractEasyInvocationHandler<Http
     }
 
     @Override
-    public IFilter[] getFilter() {
-        return iFilters;
+    public FilterChain getFilter() {
+        return filterChain;
     }
 
     @Override
@@ -67,11 +67,8 @@ public class ServletInvocationHandler extends AbstractEasyInvocationHandler<Http
     protected Object invoke(HttpServletRequest request, HttpServletResponse response, Object[] args) throws InvocationTargetException, IllegalAccessException, IOException {
         Object invoke = getMethod().invoke(getTarget(), getArgs(args));
 
-        if (getFilter() != null) {
-            for (IFilter iFilter : getFilter()) {
-                invoke = iFilter.after(getHttpMethod(args), getHttpServerRequest(args), getHttpServerResponse(args), invoke);
-            }
-        }
+        invoke = getFilter().doAfterFilter(getHttpMethod(args), invoke, args);
+
         if (Objects.nonNull(invoke)) {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");

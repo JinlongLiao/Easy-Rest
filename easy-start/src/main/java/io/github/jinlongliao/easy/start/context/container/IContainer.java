@@ -1,8 +1,11 @@
 package io.github.jinlongliao.easy.start.context.container;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
+import io.github.jinlongliao.easy.common.filter.FilterChain;
+import io.github.jinlongliao.easy.common.filter.IFilter;
 import io.github.jinlongliao.easy.server.action.IRouter;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -23,5 +26,12 @@ public interface IContainer {
      * @return /
      */
     Map<HttpMethod, Map<String, IRouter>> getRouter();
+
+    /**
+     * 过滤器责任链
+     *
+     * @return /
+     */
+    FilterChain getFilterChain();
 
 }

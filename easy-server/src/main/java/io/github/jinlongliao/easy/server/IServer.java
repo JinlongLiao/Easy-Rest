@@ -1,12 +1,15 @@
 package io.github.jinlongliao.easy.server;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
+import io.github.jinlongliao.easy.common.filter.FilterChain;
+import io.github.jinlongliao.easy.common.filter.IFilter;
 import io.github.jinlongliao.easy.server.proxy.EasyMethod;
 import io.github.jinlongliao.easy.config.server.ServerConfig;
 import io.github.jinlongliao.easy.server.action.IRouter;
 
 import javax.servlet.ServletException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +31,14 @@ public interface IServer {
      * 构建路由
      *
      * @param router
+     * @param filterChain
      * @param methodCache
      * @param methodIRouterMap
      */
-    void buildRouter(Map<HttpMethod, Map<String, IRouter>> router, Map<String, List<EasyMethod>> methodCache, Map<Method, IRouter> methodIRouterMap) throws IllegalAccessException, InstantiationException;
+    void buildRouter(Map<HttpMethod, Map<String, IRouter>> router,
+                     FilterChain filterChain,
+                     Map<String, List<EasyMethod>> methodCache,
+                     Map<Method, IRouter> methodIRouterMap) throws IllegalAccessException, InstantiationException;
 
     /**
      * 添加路由
@@ -44,4 +51,5 @@ public interface IServer {
      * @return 唯一名称
      */
     String getName();
+
 }

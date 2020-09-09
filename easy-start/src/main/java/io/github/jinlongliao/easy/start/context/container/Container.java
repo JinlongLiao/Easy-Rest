@@ -4,17 +4,24 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import io.github.jinlongliao.easy.common.annotation.Component;
+import io.github.jinlongliao.easy.common.annotation.Filter;
 import io.github.jinlongliao.easy.common.annotation.RequestMapping;
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
+import io.github.jinlongliao.easy.common.filter.FilterChain;
+import io.github.jinlongliao.easy.common.filter.IFilter;
 import io.github.jinlongliao.easy.common.util.ClassUtils;
 import io.github.jinlongliao.easy.server.ServerFactory;
 import io.github.jinlongliao.easy.server.action.IRouter;
+import io.github.jinlongliao.easy.server.filter.DefaultFilterChain;
 import io.github.jinlongliao.easy.start.context.AppContext;
 import io.github.jinlongliao.easy.server.proxy.EasyMethod;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author liaojinlong
@@ -24,6 +31,7 @@ public class Container implements IContainer {
     private AppContext appContext;
     private Map<String, Class> componentCache = new ConcurrentHashMap<>();
     private Map<String, List<EasyMethod>> methodCache = new ConcurrentHashMap<>();
+    private static Logger log = io.github.jinlongliao.easy.reflection.util.LogUtil.findLogger(Container.class);
 
     private Map<Method, IRouter> methodIRouterMap = new ConcurrentHashMap<>();
     /**
@@ -34,6 +42,7 @@ public class Container implements IContainer {
      * </pre>
      */
     private Map<HttpMethod, Map<String, IRouter>> routers;
+    private FilterChain defaultFilterChain = new DefaultFilterChain(new CopyOnWriteArrayList<>());
 
     {
         final HttpMethod[] httpMethods = HttpMethod.values();
@@ -56,6 +65,7 @@ public class Container implements IContainer {
         buildComponent();
         buildController();
         buildAction();
+        buildFilter();
     }
 
 
@@ -64,10 +74,37 @@ public class Container implements IContainer {
         return routers;
     }
 
-    private void buildAction() throws IllegalAccessException, InstantiationException {
-        ServerFactory.getInstance().getServer(appContext.getServerConfig()).buildRouter(routers, methodCache, methodIRouterMap);
+    @Override
+    public FilterChain getFilterChain() {
+        return null;
     }
 
+    /**
+     * 构建Action
+     *
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    private void buildAction() throws IllegalAccessException, InstantiationException {
+        ServerFactory.getInstance().getServer(appContext.getServerConfig()).buildRouter(routers, defaultFilterChain, methodCache, methodIRouterMap);
+    }
+
+    /**
+     * 构建Filter
+     */
+    private void buildFilter() {
+        final Set<Class<?>> classes = appContext.getReflection().reflectionType(Filter.class);
+        classes.stream().forEach(item -> {
+            final boolean b = Modifier.isAbstract(item.getModifiers()) || Modifier.isInterface(item.getModifiers());
+            if (!b) {
+                try {
+                    defaultFilterChain.addFilter((IFilter) item.getDeclaredConstructor().newInstance());
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+    }
 
     /**
      * 构建Controller

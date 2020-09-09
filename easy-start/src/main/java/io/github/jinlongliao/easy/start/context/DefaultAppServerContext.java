@@ -66,9 +66,8 @@ public class DefaultAppServerContext implements AppContext {
 
     @Override
     public void start() throws Exception {
-        final Map<HttpMethod, Map<String, IRouter>> router = container.getRouter();
         httpServer.start(serverConfig);
-        httpServer.addRouter(router);
+        httpServer.addRouter(container.getRouter());
     }
 
 }

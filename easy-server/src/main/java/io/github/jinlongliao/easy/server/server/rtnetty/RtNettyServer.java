@@ -3,6 +3,8 @@ package io.github.jinlongliao.easy.server.server.rtnetty;
 import cn.hutool.core.collection.CollectionUtil;
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
 import io.github.jinlongliao.easy.common.exception.top.EasyRestRuntimeException;
+import io.github.jinlongliao.easy.common.filter.FilterChain;
+import io.github.jinlongliao.easy.common.filter.IFilter;
 import io.github.jinlongliao.easy.server.proxy.netty.NettyInvocationHandler;
 import io.github.jinlongliao.easy.server.proxy.ComputerArgs;
 import io.github.jinlongliao.easy.server.proxy.EasyMethod;
@@ -19,10 +21,7 @@ import reactor.netty.http.server.HttpServerRoutes;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -57,6 +56,7 @@ public class RtNettyServer implements IServer {
      */
     @Override
     public void buildRouter(Map<HttpMethod, Map<String, IRouter>> routers,
+                            FilterChain filterChain,
                             Map<String, List<EasyMethod>> methodCache,
                             Map<Method, IRouter> methodIRouterMap) throws IllegalAccessException, InstantiationException {
         Map<Method, NettyRouter> methodIRouterMap2 = new HashMap<>(16);
@@ -77,9 +77,8 @@ public class RtNettyServer implements IServer {
 
                         final InvocationHandler invocationHandler = new NettyInvocationHandler(aClass.newInstance(),
                                 method,
-                                null,
+                                filterChain,
                                 computerArgs);
-
                         router = (NettyRouter) Proxy.newProxyInstance(NettyRouter.class.getClassLoader(),
                                 new Class[]{NettyRouter.class},
                                 invocationHandler);
