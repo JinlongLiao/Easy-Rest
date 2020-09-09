@@ -1,4 +1,4 @@
-package io.github.jinlongliao.easy.server.servlet;
+package io.github.jinlongliao.easy.server.server.servlet;
 
 import cn.hutool.core.collection.CollectionUtil;
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
@@ -10,7 +10,7 @@ import io.github.jinlongliao.easy.server.action.IRouter;
 import io.github.jinlongliao.easy.server.proxy.ComputerArgs;
 import io.github.jinlongliao.easy.server.proxy.EasyMethod;
 import io.github.jinlongliao.easy.server.proxy.servlet.ServletInvocationHandler;
-import io.github.jinlongliao.easy.server.servlet.router.ServletRouter;
+import io.github.jinlongliao.easy.server.server.servlet.router.ServletRouter;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;

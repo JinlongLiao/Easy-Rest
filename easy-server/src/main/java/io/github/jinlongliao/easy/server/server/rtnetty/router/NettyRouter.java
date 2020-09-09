@@ -1,4 +1,4 @@
-package io.github.jinlongliao.easy.server.rtnetty.router;
+package io.github.jinlongliao.easy.server.server.rtnetty.router;
 
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
 import io.github.jinlongliao.easy.server.action.IRouter;

@@ -1,4 +1,4 @@
-package io.github.jinlongliao.easy.server.servlet;
+package io.github.jinlongliao.easy.server.server.servlet;
 
 import cn.hutool.core.collection.CollectionUtil;
 import io.github.jinlongliao.easy.common.constant.HttpMethod;
@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * @author liaojinlong
+ * @since 2020/7/21 10:58
+ */
 public class GeneralServlet extends HttpServlet {
     private static Map<HttpMethod, Map<String, IRouter>> router;
 
