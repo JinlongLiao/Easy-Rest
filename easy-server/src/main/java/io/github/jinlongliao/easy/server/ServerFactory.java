@@ -1,10 +1,10 @@
 package io.github.jinlongliao.easy.server;
 
+import io.github.jinlongliao.easy.common.exception.top.EasyRestRuntimeException;
 import io.github.jinlongliao.easy.config.server.ServerConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 工厂类
@@ -14,14 +14,17 @@ import java.util.ServiceLoader;
  */
 public class ServerFactory {
     private static ServerFactory instance = null;
-    private static final List<IServer> SERVERS = new ArrayList<>();
+    private static final Map<String, IServer> SERVERS = new ConcurrentHashMap<>();
     public static final String DEFAULT = "DEFAULT";
     private IServer server;
 
     static {
         final ServiceLoader<IServer> load = ServiceLoader.load(IServer.class);
         for (IServer iServer : load) {
-            SERVERS.add(iServer);
+            final IServer absent = SERVERS.putIfAbsent(iServer.getName(), iServer);
+            if (Objects.isNull(absent)) {
+                throw new EasyRestRuntimeException(iServer.getName() + " already Register By:" + SERVERS.get(iServer.getName()).getName());
+            }
         }
     }
 
@@ -38,11 +41,7 @@ public class ServerFactory {
             //双重检查加锁，只有在第一次实例化时，才启用同步机制，提高了性能。
             synchronized (ServerFactory.class) {
                 if (server == null) {
-                    for (IServer iServer : SERVERS) {
-                        if (iServer.getName().endsWith(serverConfig.getServerType())) {
-                            server = iServer;
-                        }
-                    }
+                    server = SERVERS.get(serverConfig.getServerType());
                 }
             }
         }
